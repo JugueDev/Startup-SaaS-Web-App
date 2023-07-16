@@ -1,0 +1,36 @@
+.header {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: skyblue;
+}
+.ul {
+    float:right;
+    list-style-type: none;
+    margin: 5px;
+    padding: 2px;
+    overflow: auto;
+    
+  }
+  
+.li {
+    padding: 10px;
+    float: left;
+  }
+
+  .a {
+    color: white;
+    text-decoration:solid;
+    font-weight: bold;
+
+  }
+
+  .img {
+    margin-left: 10px;
+    padding: 5px;
+    float:left;
+    height: 50px;
+    width: 100px;
+  }

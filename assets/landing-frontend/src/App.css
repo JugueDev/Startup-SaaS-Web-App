@@ -1,0 +1,9 @@
+.App {
+  text-align: center;
+}
+
+.Content {
+  position: relative;
+  text-decoration: dotted;
+  top: 60px;
+}
