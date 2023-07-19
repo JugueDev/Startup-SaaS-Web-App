@@ -20,6 +20,14 @@ npm run build
 
 ```
 
+### Backend
+```
+# Para descargar las librerías que necesitan los layers de Lambda en la carpeta python /layers/python
+pip install --target ./layers/python jsonpickle --no-user
+
+```
+
+
 ## Carpeta CDK
 Aquí se almacena el código de la infraestructura.
 

@@ -1,0 +1,4 @@
+aws_lambda_powertools*
+jsonpickle*
+typing*
+__pycache*

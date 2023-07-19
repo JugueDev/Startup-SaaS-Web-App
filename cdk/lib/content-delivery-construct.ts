@@ -6,6 +6,7 @@ import { OriginAccessIdentity} from "aws-cdk-lib/aws-cloudfront";
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
+import { CfnOutput }  from 'aws-cdk-lib';
 
 export interface ContentDeliveryConstructProps {
     /** props needed to work **/
@@ -43,6 +44,13 @@ export class ContentDeliveryConstruct extends Construct {
           },
         ]
       })
+
+
+    new CfnOutput(this, 'website-url', {
+        value: cloudfrontDistribution.distributionDomainName,
+        description: 'The URL of our website',
+        exportName: 'websiteUrl',
+    });
 
   }
 }

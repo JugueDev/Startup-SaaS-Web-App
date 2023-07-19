@@ -1,6 +1,8 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { FrontendConstruct } from './frontend-construct';
+import { DatabaseConstruct } from './database-construct';
+import { BackendConstruct } from './backend-construct';
 import { ContentDeliveryConstruct } from './content-delivery-construct';
 
 export class CdkStack extends Stack {
@@ -15,6 +17,11 @@ export class CdkStack extends Stack {
       {
         frontendBucket: frontendConstruct.frontendBucket
       })
+    const databaseConstruct = new DatabaseConstruct(this, 'databaseConstruct');
+    const backendConstruct = new BackendConstruct(this, 'backendConstruct', 
+    {
+      userTable: databaseConstruct.userTable
+    });
 
   }
 }

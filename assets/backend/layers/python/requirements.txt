@@ -1,0 +1,2 @@
+jsonpickle
+aws_lambda_powertools
