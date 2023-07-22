@@ -57,11 +57,11 @@ def update_user(event, payload, userId):
         user = User(userId, payload.name, payload.email)
 
         response = table.update_item(Key={'userId': user.userId},
-        UpdateExpression="set #n=:userName, email=:email",
+        UpdateExpression="set #n=:name, email=:email",
         ExpressionAttributeNames= {'#n':'name'},
         ExpressionAttributeValues={
-            ':userName': user.name,
-            ':category': user.email
+            ':name': user.name,
+            ':email': user.email
         },
         ReturnValues="UPDATED_NEW")
     except ClientError as e:

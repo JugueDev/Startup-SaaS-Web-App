@@ -61,7 +61,7 @@ export class BackendConstruct extends Construct {
         description: 'Utils',
         });
       
-    // Se define una función Lambda 
+    // Se define la Lambda para get users
     const getUserLambda = new lambda.Function(this, 'backend-get-user', {
         runtime: lambda.Runtime.PYTHON_3_9,
         handler: 'user_service.get_user',
@@ -72,17 +72,53 @@ export class BackendConstruct extends Construct {
         layers: [utils]
       });
 
+    // Se define la Lambda para create users
+    const createUserLambda = new lambda.Function(this, 'backend-create-user', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'user_service.create_user',
+      functionName: "backend-create-user",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/users")), 
+      role: lambdaRole,
+      environment: { ["USER_TABLE_NAME"]: props.userTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para eliminar users
+    const deleteUserLambda = new lambda.Function(this, 'backend-delete-user', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'user_service.delete_user',
+      functionName: "backend-delete-user",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/users")), 
+      role: lambdaRole,
+      environment: { ["USER_TABLE_NAME"]: props.userTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para actualizar users
+    const updateUserLambda = new lambda.Function(this, 'backend-update-user', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'user_service.update_user',
+      functionName: "backend-update-user",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/users")), 
+      role: lambdaRole,
+      environment: { ["USER_TABLE_NAME"]: props.userTable.tableName},
+      layers: [utils]
+    });
+
     // Se crea un api gateway que recibirá las peticiones al backend
     this.api = new apigw.RestApi(this, "RestApi", {
       deploy: true
     });
     
-    this.api.root
-        .addResource("user")
-        .addResource("{id}")
-        .addMethod("GET", new apigw.LambdaIntegration(getUserLambda))
-        ;
-    
+    const user =  this.api.root
+        .addResource("user");
+        user.addMethod("POST", new apigw.LambdaIntegration(createUserLambda))
+    const user_id =  user.addResource("{id}");
+    user_id.addMethod("GET", new apigw.LambdaIntegration(getUserLambda));
+    user_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteUserLambda));
+    user_id.addMethod("POST", new apigw.LambdaIntegration(updateUserLambda));
+
+
     new CfnOutput(this, "ApiUrl", { value: this.api.url });
  
   }
