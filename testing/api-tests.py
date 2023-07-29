@@ -44,4 +44,12 @@ if __name__ == "__main__":
     sale_updated = '{"date": "12-02-2000", "price": "16"}'
     test_requests(sale, sale_updated, "sale", "saleId")
 
+    # Testing Comment microservices
+    print("\n\n******** Testing COMMENT ********")
+    comment = '{"userName": "Matias", "platform": "12"}'
+    comment_updated = '{"userName": "Daniela", "platform": "12"}'
+    test_requests(comment, comment_updated, "comment", "commentId")
+
+
+
     print("Everything passed")

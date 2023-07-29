@@ -106,6 +106,8 @@ export class BackendConstruct extends Construct {
       environment: { ["USER_TABLE_NAME"]: props.userTable.tableName},
       layers: [utils]
     });
+
+    
       
     // Se define la Lambda para get sales
     const getSaleLambda = new lambda.Function(this, 'backend-get-sale', {
@@ -152,6 +154,54 @@ export class BackendConstruct extends Construct {
     });
 
 
+    
+      
+    // Se define la Lambda para get comments
+    const getCommentLambda = new lambda.Function(this, 'backend-get-comment', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'comment_service.get_comment',
+      functionName: "backend-get-comment",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/comments")), 
+      role: lambdaRole,
+      environment: { ["COMMENT_TABLE_NAME"]: props.commentTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para create comments
+    const createCommentLambda = new lambda.Function(this, 'backend-create-comment', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'comment_service.create_comment',
+      functionName: "backend-create-comment",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/comments")), 
+      role: lambdaRole,
+      environment: { ["COMMENT_TABLE_NAME"]: props.commentTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para eliminar comments
+    const deleteCommentLambda = new lambda.Function(this, 'backend-delete-comment', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'comment_service.delete_comment',
+      functionName: "backend-delete-comment",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/comments")), 
+      role: lambdaRole,
+      environment: { ["COMMENT_TABLE_NAME"]: props.commentTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para actualizar comments
+    const updateCommentLambda = new lambda.Function(this, 'backend-update-comment', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'comment_service.update_comment',
+      functionName: "backend-update-comment",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/comments")), 
+      role: lambdaRole,
+      environment: { ["COMMENT_TABLE_NAME"]: props.commentTable.tableName},
+      layers: [utils]
+    });
+
+
+
 
     // Se crea un api gateway que recibirá las peticiones al backend
     this.api = new apigw.RestApi(this, "RestApi", {
@@ -170,13 +220,25 @@ export class BackendConstruct extends Construct {
     user_id.addMethod("POST", new apigw.LambdaIntegration(updateUserLambda));
     
     // SALE methods
-    const sale =  api_resource
+    const sale = api_resource
         .addResource("sale");
         sale.addMethod("POST", new apigw.LambdaIntegration(createSaleLambda))
     const sale_id =  sale.addResource("{id}");
     sale_id.addMethod("GET", new apigw.LambdaIntegration(getSaleLambda));
     sale_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteSaleLambda));
     sale_id.addMethod("POST", new apigw.LambdaIntegration(updateSaleLambda));
+   
+    // COMMENT methods
+    const comment =  api_resource
+        .addResource("comment");
+        comment.addMethod("POST", new apigw.LambdaIntegration(createCommentLambda))
+    const comment_id =  comment.addResource("{id}");
+    comment_id.addMethod("GET", new apigw.LambdaIntegration(getCommentLambda));
+    comment_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteCommentLambda));
+    comment_id.addMethod("POST", new apigw.LambdaIntegration(updateCommentLambda));
+
+
+
 
     new CfnOutput(this, "ApiUrl", { value: this.api.url });
   }
