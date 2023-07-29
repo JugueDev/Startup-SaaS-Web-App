@@ -6,15 +6,17 @@ import { RemovalPolicy } from "aws-cdk-lib";
 
 export class DatabaseConstruct extends Construct {
   public readonly userTable: dynamodb.Table; 
+  public readonly saleTable: dynamodb.Table; 
+  public readonly commentTable: dynamodb.Table; 
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
     
     // Tabla de Proyectos
-    const projectTable = new dynamodb.Table(this, 'ProjectsTable', { 
-      partitionKey: { name: 'projectId', type: dynamodb.AttributeType.STRING, },
+    this.saleTable = new dynamodb.Table(this, 'SalesTable', { 
+      partitionKey: { name: 'saleId', type: dynamodb.AttributeType.STRING, },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, 
-      tableName: 'ProjectsTable',
+      tableName: 'SalesTable',
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
@@ -25,7 +27,16 @@ export class DatabaseConstruct extends Construct {
       tableName: 'UserTable',
       removalPolicy: RemovalPolicy.DESTROY,
     });
+ 
+    // Tabla de Usuarios
+    this.commentTable = new dynamodb.Table(this, 'CommentTable', { 
+      partitionKey: { name: 'commentId', type: dynamodb.AttributeType.STRING, },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, 
+      tableName: 'CommentTable',
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
     
+   
 
   }
 }

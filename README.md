@@ -49,13 +49,13 @@ cdk deploy
 Para utilizar o probar los métodos de la API podemos utilizar los siquientes ejemplos:
 ```
 # Para cargar nuevos usuarios
-curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/user -H 'Content-Type: application/json'  -d '{ "name": "Alexa", "email": "abc@gmail.com"}'
+curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/user -H 'Content-Type: application/json'  -d '{ "name": "Alexa", "email": "abc@gmail.com", "edad": "15", "prod_favorito": "helados", "interaccion": "7"}'
 
 # Para obtener un usuario por id
 curl -X GET https://<api-id>.execute-api.<region>.amazonaws.com/prod/user/<id>
 
 # Para actualizar un usuario por id
-curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/user/<id> -H 'Content-Type: application/json' -d '{ "name": "Pepe", "email": "abc@gmail.com"}'
+curl -X POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/user/<id> -H 'Content-Type: application/json' -d '{ "name": "Pepe", "email": "abc@gmail.com", "edad": "15", "prod_favorito": "helados", "interaccion": "1"}'
 
 # Para eliminar un usuario por id
 curl -X DELETE https://<api-id>.execute-api.<region>.amazonaws.com/prod/user/<id>

@@ -11,6 +11,8 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 export interface BackendConstructProps {
     /** props needed to work **/
     userTable: dynamodb.Table,
+    saleTable: dynamodb.Table,
+    commentTable: dynamodb.Table,
   }
 
 export class BackendConstruct extends Construct {
@@ -47,7 +49,7 @@ export class BackendConstruct extends Construct {
     // Añademos un User Policy al rol de IAM
     lambdaRole.addToPolicy(
         new iam.PolicyStatement({
-            resources: [props.userTable.tableArn],
+            resources: [props.userTable.tableArn, props.saleTable.tableArn, props.commentTable.tableArn],
             actions: ["dynamodb:GetItem","dynamodb:UpdateItem","dynamodb:PutItem","dynamodb:DeleteItem","dynamodb:Query","dynamodb:Scan"],
         })
     );
@@ -104,12 +106,59 @@ export class BackendConstruct extends Construct {
       environment: { ["USER_TABLE_NAME"]: props.userTable.tableName},
       layers: [utils]
     });
+      
+    // Se define la Lambda para get sales
+    const getSaleLambda = new lambda.Function(this, 'backend-get-sale', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'sale_service.get_sale',
+      functionName: "backend-get-sale",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/sales")), 
+      role: lambdaRole,
+      environment: { ["SALE_TABLE_NAME"]: props.saleTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para create sales
+    const createSaleLambda = new lambda.Function(this, 'backend-create-sale', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'sale_service.create_sale',
+      functionName: "backend-create-sale",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/sales")), 
+      role: lambdaRole,
+      environment: { ["SALE_TABLE_NAME"]: props.saleTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para eliminar sales
+    const deleteSaleLambda = new lambda.Function(this, 'backend-delete-sale', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'sale_service.delete_sale',
+      functionName: "backend-delete-sale",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/sales")), 
+      role: lambdaRole,
+      environment: { ["SALE_TABLE_NAME"]: props.saleTable.tableName},
+      layers: [utils]
+    });
+
+    // Se define la Lambda para actualizar sales
+    const updateSaleLambda = new lambda.Function(this, 'backend-update-sale', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'sale_service.update_sale',
+      functionName: "backend-update-sale",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/sales")), 
+      role: lambdaRole,
+      environment: { ["SALE_TABLE_NAME"]: props.saleTable.tableName},
+      layers: [utils]
+    });
+
+
 
     // Se crea un api gateway que recibirá las peticiones al backend
     this.api = new apigw.RestApi(this, "RestApi", {
       deploy: true
     });
     
+    // USER methods
     const user =  this.api.root
         .addResource("user");
         user.addMethod("POST", new apigw.LambdaIntegration(createUserLambda))
@@ -117,9 +166,15 @@ export class BackendConstruct extends Construct {
     user_id.addMethod("GET", new apigw.LambdaIntegration(getUserLambda));
     user_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteUserLambda));
     user_id.addMethod("POST", new apigw.LambdaIntegration(updateUserLambda));
-
+    // SALE methods
+    const sale =  this.api.root
+        .addResource("sale");
+        sale.addMethod("POST", new apigw.LambdaIntegration(createSaleLambda))
+    const sale_id =  sale.addResource("{id}");
+    sale_id.addMethod("GET", new apigw.LambdaIntegration(getSaleLambda));
+    sale_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteSaleLambda));
+    sale_id.addMethod("POST", new apigw.LambdaIntegration(updateSaleLambda));
 
     new CfnOutput(this, "ApiUrl", { value: this.api.url });
- 
   }
 }
