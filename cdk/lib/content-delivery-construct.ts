@@ -6,11 +6,14 @@ import { OriginAccessIdentity} from "aws-cdk-lib/aws-cloudfront";
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
-import { CfnOutput }  from 'aws-cdk-lib';
+import { Stack,CfnOutput } from 'aws-cdk-lib';
+import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
 
 export interface ContentDeliveryConstructProps {
     /** props needed to work **/
     frontendBucket: s3.Bucket,
+    backendApi: apigw.RestApi; 
+
   }
 
 export class ContentDeliveryConstruct extends Construct {
@@ -22,35 +25,54 @@ export class ContentDeliveryConstruct extends Construct {
     const originAccessIdentity = new OriginAccessIdentity(this, 'OriginAccessIdentity');
     props.frontendBucket.grantRead(originAccessIdentity);
 
-    // Se crea una distribución en Cloudfront para el acceso a S3
-    const cloudfrontDistribution = new cloudfront.CloudFrontWebDistribution(this, 'Distribution', {
-        defaultRootObject: 'index.html',
-        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-        priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
-        originConfigs: [
-          {
-            s3OriginSource: {
-              s3BucketSource: props.frontendBucket,
-              originAccessIdentity: originAccessIdentity,
-            },
-            behaviors: [
-              {
-                compress: true,
-                isDefaultBehavior: true,
-                defaultTtl: Duration.seconds(0),
-                allowedMethods: cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
-              },
-            ],
-          },
-        ]
-      })
+    const apiOrigin = new cloudfront_origins.HttpOrigin(
+      `${props.backendApi.restApiId}.execute-api.${Stack.of(this).region}.amazonaws.com`,
+      {
+        customHeaders: {
+        },
+        originPath: `/${props.backendApi.deploymentStage.stageName}`,
+        originSslProtocols: [cloudfront.OriginSslPolicy.TLS_V1_2],
+        protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+      }
+    );
 
+    const s3Origin = new cloudfront_origins.S3Origin(
+      props.frontendBucket,
+      {
+        originAccessIdentity: originAccessIdentity,
+      });
+
+    
+    const cloudFrontDistribution = new cloudfront.Distribution(
+      this,
+      "CloudFrontDistribution",
+      {
+        defaultBehavior: {
+          origin: s3Origin,
+          allowedMethods:
+            cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+          viewerProtocolPolicy:
+            cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        },
+        additionalBehaviors: {
+          "/api*": {
+            origin: apiOrigin,
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+            cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+            viewerProtocolPolicy:
+              cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          },
+        },
+      }
+    );
 
     new CfnOutput(this, 'website-url', {
-        value: cloudfrontDistribution.distributionDomainName,
-        description: 'The URL of our website',
-        exportName: 'websiteUrl',
-    });
+      value: cloudFrontDistribution.distributionDomainName,
+      description: 'The URL of our website',
+      exportName: 'websiteUrl',
+  });
+
+
 
   }
 }

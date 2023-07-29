@@ -22,7 +22,8 @@ export class CdkStack extends Stack {
       this,
       'contentDeliveryConstruct', 
       {
-        frontendBucket: frontendConstruct.frontendBucket
+        frontendBucket: frontendConstruct.frontendBucket,
+        backendApi: backendConstruct.api
       })
       
 

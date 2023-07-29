@@ -62,4 +62,9 @@ curl -X DELETE https://<api-id>.execute-api.<region>.amazonaws.com/prod/user/<id
 
 ```
 
+También existe un archivo para testear los métodos creados:
+```
+python .\testing\api-tests.py https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/
+python .\testing\api-tests.py https://<distribution-id>.cloudfront.net/api/ 
+```
 

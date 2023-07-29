@@ -157,17 +157,20 @@ export class BackendConstruct extends Construct {
     this.api = new apigw.RestApi(this, "RestApi", {
       deploy: true
     });
+    const api_resource =  this.api.root
+    .addResource("api");
     
     // USER methods
-    const user =  this.api.root
+    const user =  api_resource
         .addResource("user");
         user.addMethod("POST", new apigw.LambdaIntegration(createUserLambda))
     const user_id =  user.addResource("{id}");
     user_id.addMethod("GET", new apigw.LambdaIntegration(getUserLambda));
     user_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteUserLambda));
     user_id.addMethod("POST", new apigw.LambdaIntegration(updateUserLambda));
+    
     // SALE methods
-    const sale =  this.api.root
+    const sale =  api_resource
         .addResource("sale");
         sale.addMethod("POST", new apigw.LambdaIntegration(createSaleLambda))
     const sale_id =  sale.addResource("{id}");
