@@ -200,6 +200,17 @@ export class BackendConstruct extends Construct {
       layers: [utils]
     });
 
+    // Se define la Lambda para get ALL comments
+    const getCommentsLambda = new lambda.Function(this, 'backend-get-comments', {
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'comment_service.get_comments',
+      functionName: "backend-get-comments",
+      code: lambda.Code.fromAsset(path.join(__dirname, "/../../assets/backend/comments")), 
+      role: lambdaRole,
+      environment: { ["COMMENT_TABLE_NAME"]: props.commentTable.tableName},
+      layers: [utils]
+    });
+
 
 
 
@@ -237,6 +248,8 @@ export class BackendConstruct extends Construct {
     comment_id.addMethod("DELETE", new apigw.LambdaIntegration(deleteCommentLambda));
     comment_id.addMethod("POST", new apigw.LambdaIntegration(updateCommentLambda));
 
+    api_resource.addResource("comments")
+    .addMethod("GET", new apigw.LambdaIntegration(getCommentsLambda));
 
 
 

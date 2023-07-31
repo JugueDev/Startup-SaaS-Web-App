@@ -75,7 +75,7 @@ def get_sales(event):
                 sale = sale(item['saleId'], item['date'], item['price'])
                 sales.append(sale)
         logger.info("Get sale succeeded")
-        return sale            
+        return sales            
     except ClientError as e:
         logger.error(e.response['Error']['Message'])
         raise Exception('Error getting all sale', e)

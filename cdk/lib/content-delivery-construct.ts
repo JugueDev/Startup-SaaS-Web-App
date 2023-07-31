@@ -47,6 +47,7 @@ export class ContentDeliveryConstruct extends Construct {
       this,
       "CloudFrontDistribution",
       {
+        defaultRootObject: "index.html",
         defaultBehavior: {
           origin: s3Origin,
           allowedMethods:

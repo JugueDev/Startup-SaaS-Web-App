@@ -71,10 +71,10 @@ def get_comments(event):
         response = table.scan()    
         if (len(response['Items']) > 0):
             for item in response['Items']:
-                comment = Comment(item['commentId'], item['date'], item['price'])
+                comment = Comment(item['commentId'], item['userName'], item['platform'])
                 comments.append(comment)
         logger.info("Get comment succeeded")
-        return comment            
+        return comments            
     except ClientError as e:
         logger.error(e.response['Error']['Message'])
         raise Exception('Error getting all comment', e)
