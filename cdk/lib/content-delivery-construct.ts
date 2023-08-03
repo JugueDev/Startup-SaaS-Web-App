@@ -48,6 +48,13 @@ export class ContentDeliveryConstruct extends Construct {
       "CloudFrontDistribution",
       {
         defaultRootObject: "index.html",
+        errorResponses: [
+          {
+            httpStatus: 404,
+            responseHttpStatus: 200,
+            responsePagePath: '/index.html'  // Due to the use of React Router and Static Hosting
+          },
+        ],
         defaultBehavior: {
           origin: s3Origin,
           allowedMethods:
