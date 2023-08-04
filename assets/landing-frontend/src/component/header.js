@@ -10,6 +10,7 @@ function Header (){
         <li className="li"><Link to="/" className="a">Home</Link></li>
         <li className="li"><Link to="/about" className="a">About Us</Link></li>
         <li className="li"><Link to="/contact" className="a">Contact Us</Link></li>
+        <li className="li"><Link to="/others" className="a">Others</Link></li>
     </ul>
 </div>
 )

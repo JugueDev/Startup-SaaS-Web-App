@@ -3,6 +3,7 @@ import { BrowserRouter as Router,Routes, Route } from 'react-router-dom';
 import Home from './component/home';
 import About from './component/about';
 import Contact from './component/contact';
+import Others from './component/others';
 import Header from './component/header';
 import Footer from './component/footer';
 import './App.css';
@@ -21,6 +22,7 @@ render() {
 					<Route exact path='/' element={< Home />}></Route>
 					<Route exact path='/about' element={< About />}></Route>
 					<Route exact path='/contact' element={< Contact />}></Route>
+					<Route exact path='/others' element={< Others />}></Route>
 			</Routes>
 		</div>
 		</div>
